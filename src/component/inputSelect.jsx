@@ -2,11 +2,17 @@ import React from "react";
 import reactSelect from "react-select";
 // import Select from "react-select/dist/declarations/src/Select";
 
-export default function InputSelect({ children, ...props }) {
+export default function InputSelect({ children, isError,...props }) {
   return (
-    <div className="mt-5 space-y-2 ">
+    <div className="mt-3 space-y-2 ">
       <label htmlFor="">Masuk Sebagai</label>
-      <div className=" p-3 w-full bg-stone-50 border-2 rounded-md  shadow-sm">
+      <div
+        className={
+          isError
+            ? "border-2 border-red-500 p-3 rounded-md bg-red-50 shadow-sm ring-0 outline-0"
+            : "border-2 p-3 rounded-md bg-stone-50 shadow-sm ring-0 outline-0"
+        }
+      >
         <select
           {...props}
           className="w-full bg-transparent outline-none"

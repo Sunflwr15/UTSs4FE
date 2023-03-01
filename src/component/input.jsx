@@ -7,19 +7,22 @@ const InputText = ({
   value,
   type,
   name,
-  label,
+  isError,
   placeholder,
+  children,
 }) => {
   // Pass the useFormik() hook initial form values and a submit function that will
   // be called when the form is submitted
 
   return (
-    <div className="space-y-2 flex flex-col mt-5">
-      <label htmlFor="email" className="">
-        {label}
-      </label>
+    <div className="flex flex-col">
+      {children}
       <input
-        className="border-2 p-3 rounded-md bg-stone-50 shadow-sm"
+        className={
+          isError
+            ? "border-2 border-red-500 p-3 rounded-md bg-red-50 shadow-sm ring-0 outline-0"
+            : "border-2 p-3 rounded-md bg-stone-50 shadow-sm ring-0 outline-0"
+        }
         id={id}
         name={name}
         placeholder={placeholder}

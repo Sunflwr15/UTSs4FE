@@ -1,19 +1,61 @@
-import { Field, useFormik } from "formik";
 import React from "react";
+import { useNavigate } from "react-router";
+import { loginPetugas, loginSiswa } from "../api/apiAuth";
 import Button from "../component/button";
 import InputText from "../component/input";
 import InputSelect from "../component/inputSelect";
+import * as Yup from "yup";
+import { Formik, Form, Field, useFormik } from "formik";
+import { authLoginPetugas, authLoginSiswa } from "../redux/action/authAction";
+import { useDispatch } from "react-redux";
 
 function Login() {
+  const navigate = useNavigate();
+  let dispatch = useDispatch();
+
+  const loginSchema = Yup.object().shape({
+    nis: Yup.string()
+      .min(2, "Too Short!")
+      .max(50, "Too Long!")
+      .required("Required"),
+    nama: Yup.string()
+      .min(2, "Too Short!")
+      .max(50, "Too Long!")
+      .required("Required"),
+    role: Yup.string().required("Required"),
+  });
   const formik = useFormik({
     initialValues: {
       nis: "",
-      name: "",
+      nama: "",
       role: "",
     },
-
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    validationSchema: loginSchema,
+    onSubmit: async (values) => {
+      try {
+        // console.log(JSON.stringify(values, null, 2));
+        if (values.role === "siswa") {
+          const response = await dispatch(authLoginSiswa(values));
+          console.log(response);
+          // alert(response.data.msg);
+          if (response.status === "success") {
+            navigate("/home");
+          }
+        } else if (values.role === "admin" || values.role === "petugas") {
+          const response = await dispatch(authLoginPetugas(values));
+          console.log(response);
+          // alert(response.data.msg);
+          if (response.status === "success") {
+            navigate("/home");
+          }
+        }
+      } catch (error) {
+        if (error.response.status === 422) {
+          alert(error.response.data.msg);
+        } else {
+          console.log(error);
+        }
+      }
       // console.log(values);
     },
   });
@@ -44,36 +86,44 @@ function Login() {
               label="NIS"
               id={"nis"}
               name={"nis"}
-              type={"number"}
+              // type={"number"}
+              isError={formik.errors.nis}
               value={formik.values.nis}
               handleChange={formik.handleChange}
-            ></InputText>
+            >
+              <label htmlFor="email" className="pb-2 mt-3">
+                NIS/Password
+              </label>
+            </InputText>
+            {/* {formik.errors.nis ? <div>{formik.errors.nis}</div> : null} */}
+
             <InputText
               placeholder={"Masukan nama"}
               label="Nama"
-              id={"name"}
-              name={"name"}
+              id={"nama"}
+              name={"nama"}
+              isError={formik.errors.nama}
               type={"name"}
-              value={formik.values.name}
+              value={formik.values.nama}
               handleChange={formik.handleChange}
-            ></InputText>
+            >
+              <label htmlFor="email" className="pb-2 mt-3">
+                Nama
+              </label>
+            </InputText>
+            {/* {formik.errors.nama ? <div>{formik.errors.nama}</div> : null} */}
+
             <InputSelect
               name="role"
+              isError={formik.errors.role}
               id="role"
               value={formik.values.role}
               onChange={formik.handleChange}
             ></InputSelect>
+            {/* {formik.errors.role ? <div>{formik.errors.role}</div> : null} */}
           </div>
-          <section className="flex flex-row justify-between items-center w-full">
-            <div className="space-x-2 flex flex-row">
-              <input type="checkbox" />
-              <p className="text-md">Remember me</p>
-            </div>
-            <div>
-              <p className="text-md underline">Forgot password?</p>
-            </div>
-          </section>
-          <Button textColor={"white"} title={"Submit"} type={"submit"}></Button>
+
+          <Button color={"bg-main"} title={"Submit"} type={"submit"}></Button>
         </form>
       </div>
     </div>
